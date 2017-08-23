@@ -1,5 +1,5 @@
 # criminalintent
-##Hold fragment in Activity
+## Hold fragment in Activity
 2.vertical and horizontal view
 3.RecyclerView, viewholder,adapter
 4.abstract activity
