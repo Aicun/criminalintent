@@ -1,7 +1,7 @@
 # criminalintent
 1.Hold fragment in Activity
 2.vertical and horizontal view
-3.RecyclerView, viewhoder,adapter
+3.RecyclerView, viewholder,adapter
 4.abstract activity
 5.fragment argument
 6.viewpager
