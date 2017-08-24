@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -117,11 +118,19 @@ public class CrimeFragment extends Fragment {
         mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SEND);
+                /*Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
                 intent.putExtra(Intent.EXTRA_TEXT,getCrimeReport());
                 intent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.crime_report_subject));
+                intent.createChooser(intent,getString(R.string.send_report));*/
+
+                Intent intent = ShareCompat.IntentBuilder.from(getActivity()).getIntent()
+                        .setType("text/plain")
+                        .putExtra(Intent.EXTRA_TEXT,getCrimeReport())
+                        .putExtra(Intent.EXTRA_SUBJECT,getString(R.string.crime_report_subject));
+                //activity chooser, if there are more than one activity, a list will be shown
                 intent.createChooser(intent,getString(R.string.send_report));
+
                 startActivity(intent);
             }
         });
