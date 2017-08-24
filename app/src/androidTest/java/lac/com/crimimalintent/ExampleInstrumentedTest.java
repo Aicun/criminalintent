@@ -7,6 +7,9 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Date;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -21,6 +24,16 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("lac.com.crimimalintent", appContext.getPackageName());
+        CrimeManager cm = CrimeManager.getInstance(appContext);
+        Crime c = new Crime();
+        c.setmDate(new Date());
+        c.setmTitle("Hello");
+        c.setmSolved(false);
+        c.setmSuspect("hello");
+        cm.addCrime(c);
+
+        List<Crime> list = cm.getmCrimes();
+
+        assertEquals(1, list.size());
     }
 }

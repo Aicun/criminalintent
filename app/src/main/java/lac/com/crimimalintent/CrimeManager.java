@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import lac.com.crimimalintent.database.CrimeBaseHelper;
 import lac.com.crimimalintent.database.CrimeCursorWrapper;
-import lac.com.crimimalintent.database.CrimeDbSchema;
 import lac.com.crimimalintent.database.CrimeDbSchema.CrimeTable;
 
 /**
@@ -36,6 +35,7 @@ public class CrimeManager {
     }
 
     private CrimeManager(Context context){
+        //use application context instead of activity
         mContext = context.getApplicationContext();
         mDatabase = new CrimeBaseHelper(mContext).getWritableDatabase();
     }
@@ -93,6 +93,7 @@ public class CrimeManager {
         contentValues.put(CrimeTable.Cols.TITLE,crime.getmTitle());
         contentValues.put(CrimeTable.Cols.DATE,crime.getmDate().toString());
         contentValues.put(CrimeTable.Cols.SOLVED,crime.ismSolved()?1:0);
+        contentValues.put(CrimeTable.Cols.SUSPECT,crime.getmSuspect());
         return contentValues;
     }
 
