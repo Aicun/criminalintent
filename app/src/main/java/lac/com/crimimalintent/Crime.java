@@ -58,4 +58,8 @@ public class Crime {
     public void setmSuspect(String mSuspect) {
         this.mSuspect = mSuspect;
     }
+
+    public String getCrimePhotoName() {
+        return "IMG_" + getmId().toString() + ".jpg";
+    }
 }

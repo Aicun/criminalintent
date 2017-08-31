@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
@@ -25,10 +27,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Date;
 import java.util.UUID;
+
+import lac.com.crimimalintent.utils.PictureUtils;
 
 /**
  * Created by Aicun on 8/17/2017.
@@ -38,18 +45,27 @@ public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "dialog_date";
+
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_IMAGE = 3;
 
     private Crime mCrime;
+    private File mCrimePhoto;
+
     private EditText mCrimeTitle;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
     private Button mCallSuspectButton;
+    private ImageView mCrimePhotoView;
+    private ImageButton mCrimePhotoButton;
 
     private String phoneNo;
+
+    public CrimeFragment() {
+    }
 
     public static CrimeFragment newInstance(UUID crimeId) {
         CrimeFragment crimeFragment = new CrimeFragment();
@@ -65,6 +81,7 @@ public class CrimeFragment extends Fragment {
         //mCrime = new Crime();
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeManager.getInstance(getActivity()).getCrime(crimeId);
+        mCrimePhoto = CrimeManager.getInstance(getActivity()).getCrimePhoto(mCrime);
         setHasOptionsMenu(true);
     }
 
@@ -170,6 +187,38 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        mCrimePhotoView = (ImageView) view.findViewById(R.id.crime_photo);
+
+        //if(mCrimePhotoView.getDrawable() != null) {
+            mCrimePhotoView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent crimePhotoIntent = CrimePhotoActivity.newIntent(getActivity(),mCrime.getmId());
+                    startActivity(crimePhotoIntent);
+                }
+            });
+       // }
+
+        mCrimePhotoButton = (ImageButton) view.findViewById(R.id.crime_camera);
+
+        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        boolean canTakePicture = (mCrimePhoto != null) && (captureImage.resolveActivity(manager) != null);
+        mCrimePhotoButton.setEnabled(canTakePicture);
+
+        if(canTakePicture) {
+            Uri uri = Uri.fromFile(mCrimePhoto);
+            //store picture in extra file store
+            captureImage.putExtra(MediaStore.EXTRA_OUTPUT,uri);
+        }
+        mCrimePhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(captureImage,REQUEST_IMAGE);
+            }
+        });
+
+        updateCrimePhotoView();
+
         returnResult();
         return view;
     }
@@ -209,6 +258,19 @@ public class CrimeFragment extends Fragment {
 
             mCrime.setmSuspect(suspect);
             mSuspectButton.setText(suspect);
+        }
+
+        if(requestCode == REQUEST_IMAGE) {
+            updateCrimePhotoView();
+        }
+    }
+
+    private void updateCrimePhotoView() {
+        if(mCrimePhoto == null || !mCrimePhoto.exists()) {
+            mCrimePhotoView.setImageDrawable(null);
+        } else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap(mCrimePhoto.getPath(),getActivity());
+            mCrimePhotoView.setImageBitmap(bitmap);
         }
     }
 

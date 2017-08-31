@@ -45,7 +45,8 @@ public class DatePicker2Fragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dialog_date,null);
+        //View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dialog_date,null);
+        View view = inflater.inflate(R.layout.fragment_dialog_date,null);
         mTitle = (TextView) view.findViewById(R.id.crime_date_title);
         mCrimeDateBtn = (Button) view.findViewById(R.id.crime_date_button);
         mDatePicker = (DatePicker) view.findViewById(R.id.dialog_date_date_picker);

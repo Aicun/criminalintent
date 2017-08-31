@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -85,6 +87,12 @@ public class CrimeManager {
 
     public void deleteCrime(Crime crime) {
         mDatabase.delete(CrimeTable.NAME,CrimeTable.Cols.UUID + " = ?", new String[]{crime.getmId().toString()});
+    }
+
+    public File getCrimePhoto(Crime crime) {
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if(externalFilesDir == null) return null;
+        return new File(externalFilesDir,crime.getCrimePhotoName());
     }
 
     private static ContentValues getContentValues(Crime crime) {
