@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
@@ -46,6 +47,9 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
+    private Button mCallSuspectButton;
+
+    private String phoneNo;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         CrimeFragment crimeFragment = new CrimeFragment();
@@ -137,7 +141,7 @@ public class CrimeFragment extends Fragment {
 
         final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         //no actual meaning, just disable contact app to be matched
-        pickContact.addCategory(Intent.CATEGORY_HOME);
+        //pickContact.addCategory(Intent.CATEGORY_HOME);
         mSuspectButton = (Button) view.findViewById(R.id.crime_suspect);
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,12 +153,23 @@ public class CrimeFragment extends Fragment {
         if(mCrime.getmSuspect() != null) {
             mSuspectButton.setText(mCrime.getmSuspect());
         }
-
         //if cannot find default app
         PackageManager manager = getActivity().getPackageManager();
         if(manager.resolveActivity(pickContact,PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.setEnabled(false);
         }
+
+        mCallSuspectButton = (Button) view.findViewById(R.id.call_suspect);
+        mCallSuspectButton.setEnabled(false);
+        mCallSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri number = Uri.parse(phoneNo);
+                Intent intent = new Intent(Intent.ACTION_DIAL,number);
+                startActivity(intent);
+            }
+        });
+
         returnResult();
         return view;
     }
@@ -174,12 +189,24 @@ public class CrimeFragment extends Fragment {
         }
         if(requestCode == REQUEST_CONTACT && data != null) {
             Uri uri = data.getData();
-            String[] queryFiled = new String[] {ContactsContract.Contacts.DISPLAY_NAME};
+            String[] queryFiled = new String[] {ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts._ID};
             Cursor cursor = getActivity().getContentResolver().query(uri,queryFiled,null,null,null);
 
             if(cursor.getCount() == 0) return;
             cursor.moveToFirst();
             String suspect = cursor.getString(0);
+            String contactID = cursor.getString(1);
+
+            Cursor queryPhoneNo = getActivity().getContentResolver().query(CommonDataKinds.Phone.CONTENT_URI,
+                    null,
+                    CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                    new String[]{contactID},
+                    null );
+            queryPhoneNo.moveToFirst();
+            phoneNo = queryPhoneNo.getString(queryPhoneNo.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            phoneNo = String.format("tel:%s",phoneNo);
+            mCallSuspectButton.setEnabled(true);
+
             mCrime.setmSuspect(suspect);
             mSuspectButton.setText(suspect);
         }
