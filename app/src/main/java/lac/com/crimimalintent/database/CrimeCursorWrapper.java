@@ -3,6 +3,9 @@ package lac.com.crimimalintent.database;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,12 +29,21 @@ public class CrimeCursorWrapper extends CursorWrapper {
     public Crime getCrime() {
         String uuid = getString(getColumnIndex(CrimeTable.Cols.UUID));
         String title = getString(getColumnIndex(CrimeTable.Cols.TITLE));
-        long date = getLong(getColumnIndex(CrimeTable.Cols.DATE));
+        String dateStr = getString(getColumnIndex(CrimeTable.Cols.DATE));
         int isSolved = getInt(getColumnIndex(CrimeTable.Cols.SOLVED));
         String suspect = getString(getColumnIndex(CrimeTable.Cols.SUSPECT));
 
         Crime crime = new Crime(UUID.fromString(uuid));
-        crime.setmDate(new Date(date));
+
+        DateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+        Date date = null;
+        try {
+            date = format.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        crime.setmDate(date);
         crime.setmTitle(title);
         crime.setmSolved(isSolved != 0);
         crime.setmSuspect(suspect);
