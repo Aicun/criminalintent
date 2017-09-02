@@ -17,7 +17,7 @@ public class PictureUtils {
         return getScaledBitmap(path,point.x,point.y);
     }
 
-    private static Bitmap getScaledBitmap(String path, int destWidth, int destHeight) {
+    public static Bitmap getScaledBitmap(String path, int destWidth, int destHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path,options);
